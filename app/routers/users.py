@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from .. import schemas, database, models
+from ..auth import create_access_token
 import bcrypt
 
 router = APIRouter()
@@ -38,16 +40,40 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(database.get_d
     
     return new_user
 
-@router.post("/login", response_model=schemas.UserResponse)
+@router.post("/token")
+def login_for_swagger(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+    """OAuth2 compatible token endpoint for Swagger UI authorization"""
+    db_user = db.query(models.User).filter(models.User.username == form_data.username).first()
+    if not db_user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not verify_password(form_data.password, db_user.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(data={"sub": db_user.username})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+@router.post("/login")
 def login_user(user: schemas.UserLogin, db: Session = Depends(database.get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    
     if not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    
-    return db_user
+    access_token = create_access_token(data={"sub": db_user.username})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
 @router.get("/users/{user_id}", response_model=schemas.UserResponse)
 def get_user(user_id: int, db: Session = Depends(database.get_db)):

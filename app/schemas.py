@@ -12,6 +12,9 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -23,17 +26,15 @@ class UserResponse(BaseModel):
 
 # Habit Schemas
 class HabbitCreate(BaseModel):
-    title: str
+    name: str
     description: Optional[str] = None
 
 class HabbitUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
+    name: Optional[str] = None
 
 class HabbitResponse(BaseModel):
     id: int
     title: str
-    description: Optional[str]
     owner_id: int
 
     class Config:
