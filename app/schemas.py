@@ -26,11 +26,11 @@ class UserResponse(BaseModel):
 
 # Habit Schemas
 class HabbitCreate(BaseModel):
-    name: str
+    title: str
     description: Optional[str] = None
 
 class HabbitUpdate(BaseModel):
-    name: Optional[str] = None
+    title: Optional[str] = None
 
 class HabbitResponse(BaseModel):
     id: int
@@ -42,12 +42,20 @@ class HabbitResponse(BaseModel):
 
 # Habit Completion Schemas
 class HabbitCompletionCreate(BaseModel):
-    date: date
+    date_completed: date
 
 class HabbitCompletionResponse(BaseModel):
     id: int
     habbit_id: int
-    date: date
+    date_completed: date
 
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from .. import schemas, database, models
-from ..auth import create_access_token
+from ..auth import create_access_token, get_current_user
 import bcrypt
 
 router = APIRouter()
@@ -75,36 +75,53 @@ def login_user(user: schemas.UserLogin, db: Session = Depends(database.get_db)):
         "token_type": "bearer"
     }
 
-@router.get("/users/{user_id}", response_model=schemas.UserResponse)
-def get_user(user_id: int, db: Session = Depends(database.get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+@router.get("/me", response_model=schemas.UserResponse)
+def get_current_user_info(current_user: models.User = Depends(get_current_user)):
+    """Get current authenticated user's information"""
+    return current_user
 
-@router.get("/users", response_model=list[schemas.UserResponse])
-def get_users(db: Session = Depends(database.get_db)):
-    users = db.query(models.User).all()
-    return users
-
-@router.delete("/users/{user_id}", response_model=schemas.UserResponse)
-def delete_user(user_id: int, db: Session = Depends(database.get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.delete(db_user)
+@router.put("/me", response_model=schemas.UserResponse)
+def update_current_user(
+    user_update: schemas.UserUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(database.get_db)
+):
+    """Update current user's profile (username and/or email)"""
+    # Check if username is being changed and if it's already taken
+    if user_update.username and user_update.username != current_user.username:
+        existing_user = db.query(models.User).filter(
+            models.User.username == user_update.username
+        ).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        current_user.username = user_update.username
+    
+    # Check if email is being changed and if it's already taken
+    if user_update.email and user_update.email != current_user.email:
+        existing_email = db.query(models.User).filter(
+            models.User.email == user_update.email
+        ).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already taken")
+        current_user.email = user_update.email
+    
     db.commit()
-    return db_user
+    db.refresh(current_user)
+    return current_user
 
-@router.put("/users/{user_id}", response_model=schemas.UserResponse)
-def update_user(user_id: int, user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db_user.username = user.username
-    db_user.email = user.email
-    db_user.password = hash_password(user.password)
+@router.put("/me/password")
+def change_password(
+    password_change: schemas.PasswordChange,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(database.get_db)
+):
+    """Change current user's password"""
+    # Verify old password
+    if not verify_password(password_change.old_password, current_user.password):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+    
+    # Update to new password
+    current_user.password = hash_password(password_change.new_password)
     db.commit()
-    db.refresh(db_user)
-    return db_user
-
+    
+    return {"message": "Password changed successfully"}

@@ -31,6 +31,6 @@ class HabbitCompletion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     habbit_id = Column(Integer, ForeignKey("habbits.id"), nullable=False)
-    date = Column(Date, nullable=False)
+    date_completed = Column(Date, nullable=False)
 
     habbit = relationship("Habbit", back_populates="completions")

@@ -9,7 +9,7 @@ router = APIRouter()
 @router.post("/create", response_model = schemas.HabbitResponse)
 def create_habbit(habbit: schemas.HabbitCreate , db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user) ):
     db_habbit = models.Habbit(
-        title = habbit.name,
+        title = habbit.title,
         description = habbit.description,
         owner_id = current_user.id
     )
@@ -44,7 +44,7 @@ def update_habbit(habbit_id: int, habbit: schemas.HabbitCreate , db: Session = D
     db_habbit = db.query(models.Habbit).filter(models.Habbit.id == habbit_id).first()
     if not db_habbit:
         raise HTTPException(status_code=404, detail="Habbit not found")
-    db_habbit.title = habbit.name
+    db_habbit.title = habbit.title
     db_habbit.description = habbit.description
     db.commit()
     db.refresh(db_habbit)

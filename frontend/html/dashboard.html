@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Habiture</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">Habiture</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-view="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-view="habits">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-text">My Habits</span>
+            </a>
+            <a href="#" class="nav-item" data-view="stats">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Statistics</span>
+            </a>
+            <a href="#" class="nav-item" data-view="profile">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Profile</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">👤</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-email">Member</div>
+                </div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 id="headerTitle">Dashboard</h1>
+                <p id="headerSubtitle">Track your habits and build consistency</p>
+            </div>
+            <button class="btn-add-habit" id="addHabitBtn">
+                <span>➕</span>
+                <span>Add Habit</span>
+            </button>
+        </header>
+
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="view active">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalHabits">0</div>
+                        <div class="stat-label">Total Habits</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="completedToday">0</div>
+                        <div class="stat-label">Completed Today</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="longestStreak">0</div>
+                        <div class="stat-label">Longest Streak</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="completionRate">0%</div>
+                        <div class="stat-label">Completion Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Habits -->
+            <div class="section">
+                <h2 class="section-title">Pending Habits</h2>
+                <div id="todayHabits" class="habits-list">
+                    <div class="loading">Loading habits...</div>
+                </div>
+            </div>
+
+            <!-- Completed Today -->
+            <div class="section">
+                <h2 class="section-title">✅ Completed Today</h2>
+                <div id="completedHabits" class="habits-list">
+                    <div class="empty-state">
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">No habits completed yet today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habits View -->
+        <div id="habitsView" class="view">
+            <div class="section">
+                <div id="allHabits" class="habits-grid">
+                    <div class="loading">Loading habits...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats View -->
+        <div id="statsView" class="view">
+            <div class="section">
+                <h2 class="section-title">Detailed Statistics</h2>
+                <div id="detailedStats" class="stats-detailed">
+                    <div class="loading">Loading statistics...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="profileView" class="view">
+            <div class="profile-container">
+                <!-- Profile Info Card -->
+                <div class="profile-card">
+                    <h2 class="profile-title">Profile Information</h2>
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="profileUsername">Username</label>
+                            <input 
+                                type="text" 
+                                id="profileUsername" 
+                                placeholder="Enter username"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input 
+                                type="email" 
+                                id="profileEmail" 
+                                placeholder="Enter email"
+                                required
+                            >
+                        </div>
+                        
+                        <button type="submit" class="btn-save-profile">
+                            <span>💾</span>
+                            <span>Save Changes</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Change Password Card -->
+                <div class="profile-card">
+                    <h2 class="profile-title">Change Password</h2>
+                    <form id="passwordForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input 
+                                type="password" 
+                                id="currentPassword" 
+                                placeholder="Enter current password"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input 
+                                type="password" 
+                                id="newPassword" 
+                                placeholder="Enter new password"
+                                required
+                                minlength="6"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                placeholder="Confirm new password"
+                                required
+                                minlength="6"
+                            >
+                        </div>
+                        
+                        <button type="submit" class="btn-save-profile">
+                            <span>🔒</span>
+                            <span>Change Password</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Habit Modal -->
+    <div id="habitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Habit</h2>
+                <button class="modal-close" id="closeModal">✕</button>
+            </div>
+            <form id="habitForm" class="modal-form">
+                <div class="form-group">
+                    <label for="habitTitle">Habit Name</label>
+                    <input 
+                        type="text" 
+                        id="habitTitle" 
+                        placeholder="e.g., Morning Exercise"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="habitDescription">Description (Optional)</label>
+                    <textarea 
+                        id="habitDescription" 
+                        placeholder="Add details about your habit..."
+                        rows="3"
+                    ></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveBtn">
+                        <span class="btn-text">Save Habit</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>
